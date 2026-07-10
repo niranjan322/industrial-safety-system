@@ -27,7 +27,7 @@ const Dashboard = () => {
   useEffect(() => {
     // Fetch initial data
     const fetchData = async () => {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.VITE_API_URL || '';
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
       try {
         const [latestRes, historyRes, rfidRes, alertsRes] = await Promise.all([

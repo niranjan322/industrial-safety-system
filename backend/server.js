@@ -27,6 +27,13 @@ app.use(express.json());
 // Routes
 app.use('/api', apiRoutes);
 
+// Serve Frontend Static Files
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 // Socket.io Connection
 io.on('connection', (socket) => {
   console.log('Client connected to WebSocket:', socket.id);

@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.VITE_API_URL || '';
       const res = await axios.post(`${API_URL}/api/auth/login`, { username, password });
       const { token, username: u } = res.data;
       localStorage.setItem('token', token);

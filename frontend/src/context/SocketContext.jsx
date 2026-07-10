@@ -9,8 +9,8 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    const newSocket = io(API_URL);
+    const API_URL = import.meta.env.VITE_API_URL || '';
+    const newSocket = API_URL ? io(API_URL) : io();
     setSocket(newSocket);
     
     return () => newSocket.close();
