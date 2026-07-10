@@ -1,0 +1,29 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: industrial-safety-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        value: mongodb+srv://YOUR_DB_USER:YOUR_DB_PASS@YOUR_CLUSTER.mongodb.net/industrial_safety
+      - key: JWT_SECRET
+        generateValue: true
+
+  # Frontend Static Site
+  - type: web
+    name: industrial-safety-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: industrial-safety-backend
+          envVarKey: RENDER_EXTERNAL_URL
