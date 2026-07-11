@@ -48,23 +48,31 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   
-  mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-      console.log('✅ MongoDB Connected Successfully');
-    })
-    .catch(err => {
-      console.error('\n=======================================');
-      console.error('🚨 MONGODB CONNECTION ERROR 🚨');
-      console.error('Your server is running, but the database failed to connect.');
-      console.error('Please check your MONGO_URI in Render Environment Variables.');
-      console.error('');
-      console.error('Common issues:');
-      console.error('1. You forgot to replace <password> with your real password.');
-      console.error('2. You left the < > brackets around the password.');
-      console.error('3. Network Access (IP Whitelist) is not set to 0.0.0.0/0 in MongoDB Atlas.');
-      console.error('');
-      console.error('Exact Error message from MongoDB:');
-      console.error(err.message);
-      console.error('=======================================\n');
-    });
+  try {
+    mongoose.connect(process.env.MONGO_URI || '', { useNewUrlParser: true, useUnifiedTopology: true })
+      .then(() => {
+        console.log('✅ MongoDB Connected Successfully');
+      })
+      .catch(err => {
+        console.error('\n=======================================');
+        console.error('🚨 MONGODB CONNECTION ERROR 🚨');
+        console.error('Your server is running, but the database failed to connect.');
+        console.error('Please check your MONGO_URI in Render Environment Variables.');
+        console.error('');
+        console.error('Common issues:');
+        console.error('1. You forgot to replace <password> with your real password.');
+        console.error('2. You left the < > brackets around the password.');
+        console.error('3. Network Access (IP Whitelist) is not set to 0.0.0.0/0 in MongoDB Atlas.');
+        console.error('');
+        console.error('Exact Error message from MongoDB:');
+        console.error(err.message);
+        console.error('=======================================\n');
+      });
+  } catch (error) {
+    console.error('\n=======================================');
+    console.error('🚨 MONGODB CONFIGURATION ERROR 🚨');
+    console.error('Your server is running, but the MONGO_URI is missing or completely invalid.');
+    console.error('Please add the MONGO_URI environment variable in Render.');
+    console.error('=======================================\n');
+  }
 });
