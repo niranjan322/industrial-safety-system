@@ -29,21 +29,11 @@ const protect = (req, res, next) => {
 // ========================
 router.post('/auth/login', async (req, res) => {
   const { username, password } = req.body;
-
-  // Emergency Master Bypass (Works even if Database is completely disconnected)
-  if (username === 'NIRANJAN' && password === 'Maker@2026') {
-    const secret = process.env.JWT_SECRET || 'emergency_secret_key_123';
-    const token = jwt.sign({ id: 'master_admin' }, secret, { expiresIn: '30d' });
-    return res.json({ token, username: 'NIRANJAN' });
-  }
-
   try {
     let user = await User.findOne({ username });
     if (user && (await user.matchPassword(password))) {
-      if (!process.env.JWT_SECRET) {
-        throw new Error('JWT_SECRET environment variable is missing in Render');
-      }
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+      const secret = process.env.JWT_SECRET || 'zero_config_fallback_secret_key_123';
+      const token = jwt.sign({ id: user._id }, secret, { expiresIn: '30d' });
       res.json({ token, username: user.username });
     } else {
       res.status(401).json({ message: 'Invalid credentials' });
@@ -72,11 +62,8 @@ router.post('/auth/signup', async (req, res) => {
     }
     const user = await User.create({ username, password });
     
-    if (!process.env.JWT_SECRET) {
-      throw new Error('JWT_SECRET environment variable is missing in Render');
-    }
-    
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    const secret = process.env.JWT_SECRET || 'zero_config_fallback_secret_key_123';
+    const token = jwt.sign({ id: user._id }, secret, { expiresIn: '30d' });
     res.status(201).json({ token, username: user.username });
   } catch (error) {
     console.error('Signup error:', error);

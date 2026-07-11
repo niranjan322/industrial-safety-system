@@ -1,9 +1,21 @@
-const mongoose = require('mongoose');
+let alerts = [];
 
-const alertLogSchema = new mongoose.Schema({
-  type: { type: String, enum: ['FIRE', 'GAS', 'GATE', 'RFID'], required: true },
-  message: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now }
-});
+const AlertLog = {
+  create: async (data) => {
+    const record = { ...data, timestamp: new Date(), _id: Date.now().toString() };
+    alerts.unshift(record);
+    if (alerts.length > 100) alerts.pop();
+    return record;
+  },
+  find: () => {
+    return {
+      sort: (opts) => {
+        return {
+          limit: (n) => alerts.slice(0, n)
+        };
+      }
+    };
+  }
+};
 
-module.exports = mongoose.model('AlertLog', alertLogSchema);
+module.exports = AlertLog;

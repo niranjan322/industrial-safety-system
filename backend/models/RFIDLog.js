@@ -1,9 +1,21 @@
-const mongoose = require('mongoose');
+let logs = [];
 
-const rfidLogSchema = new mongoose.Schema({
-  card_id: { type: String, required: true },
-  status: { type: String, enum: ['Authorized', 'Denied'], required: true },
-  timestamp: { type: Date, default: Date.now }
-});
+const RFIDLog = {
+  create: async (data) => {
+    const record = { ...data, timestamp: new Date(), _id: Date.now().toString() };
+    logs.unshift(record);
+    if (logs.length > 100) logs.pop();
+    return record;
+  },
+  find: () => {
+    return {
+      sort: (opts) => {
+        return {
+          limit: (n) => logs.slice(0, n)
+        };
+      }
+    };
+  }
+};
 
-module.exports = mongoose.model('RFIDLog', rfidLogSchema);
+module.exports = RFIDLog;

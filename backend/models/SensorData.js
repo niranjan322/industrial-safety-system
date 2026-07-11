@@ -1,14 +1,28 @@
-const mongoose = require('mongoose');
+let dataStore = [];
 
-const sensorDataSchema = new mongoose.Schema({
-  temperature: { type: Number, required: true },
-  gas1: { type: Number, required: true },
-  gas2: { type: Number, required: true },
-  flame1: { type: Number, required: true },
-  flame2: { type: Number, required: true },
-  gate: { type: Number, required: true },
-  system_state: { type: String, enum: ['SAFE', 'WARNING', 'DANGER'], default: 'SAFE' },
-  timestamp: { type: Date, default: Date.now }
-});
+const SensorData = {
+  create: async (data) => {
+    const record = { ...data, timestamp: new Date(), _id: Date.now().toString() };
+    dataStore.unshift(record);
+    if (dataStore.length > 100) dataStore.pop(); // Keep only last 100
+    return record;
+  },
+  findOne: () => {
+    return {
+      sort: (opts) => {
+        return dataStore[0] || null;
+      }
+    };
+  },
+  find: () => {
+    return {
+      sort: (opts) => {
+        return {
+          limit: (n) => dataStore.slice(0, n)
+        };
+      }
+    };
+  }
+};
 
-module.exports = mongoose.model('SensorData', sensorDataSchema);
+module.exports = SensorData;
