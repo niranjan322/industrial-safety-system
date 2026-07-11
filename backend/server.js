@@ -5,6 +5,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { Server } = require('socket.io');
 const apiRoutes = require('./routes/api');
+const User = require('./models/User');
 
 dotenv.config();
 
@@ -50,8 +51,19 @@ server.listen(PORT, () => {
   
   try {
     mongoose.connect(process.env.MONGO_URI || '', { useNewUrlParser: true, useUnifiedTopology: true })
-      .then(() => {
+      .then(async () => {
         console.log('✅ MongoDB Connected Successfully');
+        
+        // Setup fixed default user
+        try {
+          const userExists = await User.findOne({ username: 'NIRANJAN' });
+          if (!userExists) {
+            await User.create({ username: 'NIRANJAN', password: 'Maker@2026' });
+            console.log('✅ Fixed user (NIRANJAN) created successfully.');
+          }
+        } catch (err) {
+          console.error('Error creating fixed user:', err.message);
+        }
       })
       .catch(err => {
         console.error('\n=======================================');

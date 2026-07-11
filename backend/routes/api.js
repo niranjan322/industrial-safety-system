@@ -59,10 +59,16 @@ router.post('/auth/signup', async (req, res) => {
       return res.status(400).json({ message: 'Username already exists' });
     }
     const user = await User.create({ username, password });
+    
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET environment variable is missing in Render');
+    }
+    
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
     res.status(201).json({ token, username: user.username });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Signup error:', error);
+    res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
 
