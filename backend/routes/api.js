@@ -51,6 +51,21 @@ router.post('/auth/setup', async (req, res) => {
   res.status(201).json({ message: 'Admin created', username: user.username });
 });
 
+router.post('/auth/signup', async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const userExists = await User.findOne({ username });
+    if (userExists) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+    const user = await User.create({ username, password });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    res.status(201).json({ token, username: user.username });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // ========================
 // DATA INGESTION (FROM ESP32)
 // ========================

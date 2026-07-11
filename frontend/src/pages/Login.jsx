@@ -4,16 +4,24 @@ import { useAuth } from '../context/AuthContext';
 import { Lock, User } from 'lucide-react';
 
 const Login = () => {
+  const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, signup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const res = await login(username, password);
+    
+    let res;
+    if (isLogin) {
+      res = await login(username, password);
+    } else {
+      res = await signup(username, password);
+    }
+
     if (res.success) {
       navigate('/');
     } else {
@@ -26,7 +34,7 @@ const Login = () => {
       <div className="glass-panel p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white tracking-wider">INDUSTRIAL SAFETY</h1>
-          <p className="text-slate-400 text-sm mt-2">Control Panel Login</p>
+          <p className="text-slate-400 text-sm mt-2">{isLogin ? 'Control Panel Login' : 'Create an Account'}</p>
         </div>
         
         {error && (
@@ -68,9 +76,19 @@ const Login = () => {
             type="submit"
             className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primaryBlue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryBlue transition-colors duration-200"
           >
-            Sign In
+            {isLogin ? 'Sign In' : 'Sign Up'}
           </button>
         </form>
+
+        <div className="mt-6 text-center text-sm text-slate-400">
+          {isLogin ? "Don't have an account? " : "Already have an account? "}
+          <button 
+            onClick={() => setIsLogin(!isLogin)} 
+            className="text-primaryBlue hover:text-blue-400 font-medium transition-colors"
+          >
+            {isLogin ? 'Sign up' : 'Sign in'}
+          </button>
+        </div>
       </div>
     </div>
   );

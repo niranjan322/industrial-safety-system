@@ -32,6 +32,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const signup = async (username, password) => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || '';
+      const res = await axios.post(`${API_URL}/api/auth/signup`, { username, password });
+      const { token, username: u } = res.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('username', u);
+      setUser({ token, username: u });
+      return { success: true };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message || 'Signup failed' };
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
