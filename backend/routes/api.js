@@ -32,13 +32,17 @@ router.post('/auth/login', async (req, res) => {
   try {
     let user = await User.findOne({ username });
     if (user && (await user.matchPassword(password))) {
+      if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET environment variable is missing in Render');
+      }
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
       res.json({ token, username: user.username });
     } else {
       res.status(401).json({ message: 'Invalid credentials' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
 
